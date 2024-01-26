@@ -3,8 +3,7 @@ class WindParticle {
     this.p = p;
     this.x = p.random(-50, p.width); // Start off-screen for a natural entry
     this.y = p.random(p.height);
-    // this.size = p.random(2, 5);
-    this.size = 2;
+    this.size = p.random(5, 15);
     this.speed = p.random(1, 5);
   }
 
@@ -19,15 +18,17 @@ class WindParticle {
   }
 
   show() {
-    this.p.noStroke();
-    this.p.fill(255); // White particles, change as needed
-    this.p.ellipse(this.x, this.y, this.size, this.size);
+    // this.p.noStroke();
+
+    this.p.stroke(125, 150);
+    // this.p.ellipse(this.x, this.y, this.size, this.size);
+    this.p.line(this.x, this.y, this.x + this.size, this.y);
   }
 }
 
 function drawWind(windParticles, intensity, p) {
   // Adjust the number of particles based on intensity
-  let desiredParticles = intensity * 100; // Example scaling
+  let desiredParticles = intensity * 10; // Example scaling
 
   // Add or remove particles to reach the desired count
   while (windParticles.length < desiredParticles) {
