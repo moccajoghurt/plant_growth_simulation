@@ -21,6 +21,7 @@ class Raindrop {
 
   show() {
     this.p.fill(0, 0, 255); // Blue color
+    this.p.strokeWeight(1);
     this.p.stroke(138, 43, 226);
     this.p.line(this.x, this.y, this.x, this.y + this.len);
   }
@@ -28,7 +29,7 @@ class Raindrop {
 
 function createRain(raindrops, intensity, p) {
   // Adjust the number of raindrops based on intensity
-  let desiredDrops = intensity * 10; // Example scaling, adjust as needed
+  let desiredDrops = p.map(intensity, 0, 1, 0.1, 20);
 
   // Add or remove raindrops to reach the desired count
   while (raindrops.length < desiredDrops) {

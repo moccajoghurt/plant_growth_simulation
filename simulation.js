@@ -2,59 +2,111 @@ import { createRain } from "./Rain.js";
 import { drawSun } from "./Sun.js";
 import { drawWind } from "./Wind.js";
 import { drawTree } from "./Tree.js";
-import p5 from "https://cdn.skypack.dev/p5";
+import { drawSoil } from "./Soil.js";
+import { calculateNeed, calculateHealthState } from "./Fitness.js";
+import { drawBar, drawScore } from "./Bars.js";
 
-// Define separate sketch functions for each canvas
-function createSketch(
-  treeType,
+function createSimulationSketch(
   leafSize,
   leafCount,
   trunkThickness,
-  rootType,
-  scaleFactor,
   sunIntensity,
   rainIntensity,
-  windIntensity
+  windIntensity,
+  soilQuality,
+  score,
+  alive,
+  index
 ) {
   let raindrops = [];
   let windParticles = [];
+  let sunHealth = 1;
+  let waterHealth = 1;
+  let soilHealth = 1;
+  let windHealth = 1;
+  let healthStepsizeMultiplier = 0.05;
+
   return (sketch) => {
     sketch.setup = () => {
-      sketch.createCanvas(400, 400); // Adjust size as needed
+      sketch.createCanvas(400, 300);
     };
 
     sketch.draw = () => {
-      sketch.background(200);
+      const treeScale = 1 - Math.exp(-score[index] / 300);
+      if (treeScale > 1) {
+        treeScale = 1;
+      }
       drawSun(sunIntensity, sketch);
-      drawTree(
-        treeType,
-        leafSize,
-        leafCount,
-        trunkThickness,
-        rootType,
-        scaleFactor,
+      drawSoil(soilQuality, sketch);
+      drawTree(leafSize, leafCount, trunkThickness, sketch, treeScale);
+      drawWind(windParticles, windIntensity, sketch);
+      createRain(raindrops, rainIntensity, sketch);
+      drawScore(score[index], sketch);
+
+      let sunNeed = calculateNeed(leafSize, trunkThickness);
+      let waterNeed = calculateNeed(trunkThickness, leafCount);
+      let soilQualityNeed = calculateNeed(leafCount, leafSize);
+      let windRobustness = calculateNeed(leafCount, leafSize);
+
+      sunHealth = calculateHealthState(
+        sunNeed,
+        sunIntensity,
+        sunHealth,
+        healthStepsizeMultiplier
+      );
+      waterHealth = calculateHealthState(
+        waterNeed,
+        rainIntensity,
+        waterHealth,
+        healthStepsizeMultiplier
+      );
+      soilHealth = calculateHealthState(
+        soilQualityNeed,
+        soilQuality,
+        soilHealth,
+        healthStepsizeMultiplier
+      );
+      windHealth = calculateHealthState(
+        windRobustness,
+        windIntensity,
+        windHealth,
+        healthStepsizeMultiplier
+      );
+
+      drawBar(
+        sunHealth,
+        "Sun Nourishment",
+        sketch.color(255, 204, 0),
+        0,
         sketch
       );
-      createRain(raindrops, rainIntensity, sketch);
-      drawWind(windParticles, windIntensity, sketch);
+      drawBar(waterHealth, "Hydration", sketch.color(0, 0, 255), 1, sketch);
+      drawBar(
+        soilHealth,
+        "Soil Nutrients",
+        sketch.color(120, 67, 21),
+        2,
+        sketch
+      );
+      drawBar(
+        windHealth,
+        "Wind Robustness",
+        sketch.color(128, 128, 128),
+        3,
+        sketch
+      );
+      if (
+        sunHealth > 0 &&
+        waterHealth > 0 &&
+        soilHealth > 0 &&
+        windHealth > 0
+      ) {
+        score[index] += 1;
+      } else {
+        alive[index] = false;
+      }
     };
   };
 }
 
-// Create four p5 instances with different parameters
-new p5(
-  createSketch("pointed1", 50, 50, 40, "outwards", 1.0, 1, 2, 1),
-  "canvas1"
-);
-new p5(
-  createSketch("pointed2", 60, 40, 35, "inwards", 1.1, 0.5, 1, 2),
-  "canvas2"
-);
-new p5(
-  createSketch("rounded", 45, 60, 30, "outwards", 1.2, 0.3, 3, 3),
-  "canvas3"
-);
-new p5(
-  createSketch("pointed3", 55, 55, 45, "inwards", 1.0, 0.1, 2, 4),
-  "canvas4"
-);
+export { createSimulationSketch };

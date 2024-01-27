@@ -4,16 +4,17 @@
     <title>Multiple Canvases</title>
     <style>
       .canvas-container {
-        display: inline-block;
+        display: block; /* Changed from inline-block to block */
+        text-align: center; /* Aligns content to center */
+      }
+      #simulation-container {
+        margin-top: 10px; /* Adds space between statistics and simulation canvases */
       }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.9.0/dist/tf.min.js"></script>
   </head>
   <body>
-    <div id="canvas1" class="canvas-container"></div>
-    <div id="canvas2" class="canvas-container"></div>
-    <div id="canvas3" class="canvas-container"></div>
-    <div id="canvas4" class="canvas-container"></div>
-
-    <script type="module" src="simulation.js"></script>
+    <div id="statistics" class="canvas-container"></div>
+    <script type="module" src="Main.js"></script>
   </body>
 </html>

@@ -18,17 +18,16 @@ class WindParticle {
   }
 
   show() {
-    // this.p.noStroke();
-
+    this.p.strokeWeight(1);
     this.p.stroke(125, 150);
     // this.p.ellipse(this.x, this.y, this.size, this.size);
     this.p.line(this.x, this.y, this.x + this.size, this.y);
   }
 }
 
-function drawWind(windParticles, intensity, p) {
+function drawWind(windParticles, intensityParam, p) {
   // Adjust the number of particles based on intensity
-  let desiredParticles = intensity * 10; // Example scaling
+  let desiredParticles = p.map(intensityParam, 0, 1, 0, 100);
 
   // Add or remove particles to reach the desired count
   while (windParticles.length < desiredParticles) {
